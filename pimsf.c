@@ -61,7 +61,7 @@ void nsleep(unsigned long int period)
 	while (nanosleep(&ts, &ts) && errno == EINTR);
 }
 
-void setup_gpio
+void setup_gpio()
 {
     int mem_fd;
 
@@ -378,7 +378,7 @@ int main(int argc, char **argv)
 				return 1;
 		}
 	}
-
+        setup_gpio();
 	send_timecode(duration);
 	clock_startstop(0);
 	return 0;
