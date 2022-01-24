@@ -3,7 +3,10 @@
     by Mark Street <marksmanuk@gmail.com>
       Stanley, Falkland Islands
 
-  Connect wire antenna to GPIO4 pin 7
+   MSF Time Signal Baseband Encoder for Raspberry Pi
+    by Nick Piggott <nick@piggott.eu>
+    
+  MSF output is modulated on pin X
 ******************************************************************************/
 
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -45,22 +48,6 @@ volatile unsigned *allof7e;
 #define SETBIT(base, bit) ACCESS(base) |= 1<<bit
 #define CLRBIT(base, bit) ACCESS(base) &= ~(1<<bit)
 
-#define CM_GP0CTL 	(0x7E101070)
-#define CM_GP0DIV	(0x7E101074)
-#define GPFSEL0		(0x7E200000)
-
-struct GPCTL {
-    char SRC         : 4;
-    char ENAB        : 1;
-    char KILL        : 1;
-    char             : 1;
-    char BUSY        : 1;
-    char FLIP        : 1;
-    char MASH        : 2;
-    unsigned int     : 13;
-    char PASSWD      : 8;
-};
-
 struct MSF {
 	int a;
 	int b;	
@@ -74,9 +61,9 @@ void nsleep(unsigned long int period)
 	while (nanosleep(&ts, &ts) && errno == EINTR);
 }
 
-void setup_gpclk0(int mash, int divi, int divf)
+void setup_gpio
 {
-	int mem_fd;
+    int mem_fd;
 
     /* Open /dev/mem */
     if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC)) < 0)
@@ -97,51 +84,21 @@ void setup_gpclk0(int mash, int divi, int divf)
     if ((int)allof7e == -1)
 		exit(-1);
 
-	gpio = allof7e + 128*(4*1024);
+    gpio = allof7e + 128*(4*1024);
 
-	// Configure GPIO4 FSEL4 = ALT0
-    SETBIT(GPFSEL0, 14);
-    CLRBIT(GPFSEL0, 13);
-    CLRBIT(GPFSEL0, 12);
+    // Configure GPIO4 AS OUTPUT
+    INP_GPIO(4);
+    OUT_GPIO(4);
 
-	// Configure clock control register, leave disabled
-    struct GPCTL setupword = {
-		1,		/* clock source */
-	   	0,		/* enable */
-	   	0,		/* not kill */
-	   	0, 0,
-		(char)mash,	/* MASH */
-		0x5a	/* password */
-	};
-
-    ACCESS(CM_GP0CTL) = *((int*)&setupword);
-	nsleep(100);
-
-	// Setup DIV:
-	printf("Setting up GPCLK0 MASH=%d DIVI=%d DIVF=%d\n", mash, divi, divf);
-	int ua = (0x5a << 24) + (divi << 12) + divf;
-	ACCESS(CM_GP0DIV) = ua;
-	nsleep(100);
-
-	// Enable clock:
-	int ctl = ACCESS(CM_GP0CTL) | 0x5a000000;
-	ctl |= (1 << 4);
-    ACCESS(CM_GP0CTL) = *((int*)&ctl);
-	nsleep(100);
-
-	close(mem_fd);
+    close(mem_fd);
 }
 
 void clock_startstop(int state)
 {
-	int ctl = ACCESS(CM_GP0CTL) | 0x5a000000;
-
 	if (state)
-		ctl |= (1 << 4);
+		GPIO_SET = 1 << 4;
 	else
-		ctl &= ~(1 << 4);
-
-    ACCESS(CM_GP0CTL) = *((int*)&ctl);
+		GPIO_CLR = 1 << 4;
 }
 
 void encode_timecode(struct MSF *msf, time_t t_now)
@@ -401,9 +358,6 @@ int main(int argc, char **argv)
 	if (signal(SIGINT, signal_handler) == SIG_ERR)
 		printf("Error! Unable to catch SIGINT\n");
 
-	// DIVI = 19.2MHz/60kHz = 320
-	setup_gpclk0(0, 320, 0);
-
 	int args;
 	while ((args = getopt(argc, argv, "vset:")) != EOF)
 	{
@@ -412,21 +366,11 @@ int main(int argc, char **argv)
 			case 'v':
 				verbose = 1;
 				break;
-			case 's':
-				clock_startstop(1);
-				return 0;
-				break;
-			case 'e':
-				clock_startstop(0);
-				return 0;
-				break;
 			case 't':
 				duration = atoi(optarg);
 				break;
 			default:
 				fprintf(stderr, "Usage: pimsf [options]\n" \
-					"\t-s Start 60kHz carrier\n" \
-					"\t-e Stop 60kHz carrier\n" \
 					"\t-t <duration> Send timecode for duration seconds\n" \
 					"\t-v Verbose\n"
 				);
