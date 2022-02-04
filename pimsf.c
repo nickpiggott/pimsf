@@ -225,67 +225,55 @@ void key(int code, int offset=0)
 	// Minute marker
 	if (code == 0xff)
 	{
-		clock_startstop(0);
-		nsleep(500*1000);
 		clock_startstop(1);
+		nsleep(500*1000);
+		clock_startstop(0);
 		nsleep((500+offset)*1000);	// Apply timing offset
 	}
 
 	// Code 00
 	if (code == 0x00)
 	{
-		clock_startstop(0);
-		nsleep(100*1000);
 		clock_startstop(1);
+		nsleep(100*1000);
+		clock_startstop(0);
 		nsleep(900*1000);
 	}
 
 	// Code 01
 	if (code == 0x01)
 	{
-		clock_startstop(0);
-		nsleep(100*1000);
 		clock_startstop(1);
 		nsleep(100*1000);
 		clock_startstop(0);
 		nsleep(100*1000);
 		clock_startstop(1);
+		nsleep(100*1000);
+		clock_startstop(0);
 		nsleep(700*1000);
 	}
 
 	// Code 10
 	if (code == 0x10)
 	{
-		clock_startstop(0);
-		nsleep(200*1000);
 		clock_startstop(1);
+		nsleep(200*1000);
+		clock_startstop(0);
 		nsleep(800*1000);
 	}
 
 	// Code 11
 	if (code == 0x11)
 	{
-		clock_startstop(0);
-		nsleep(300*1000);
 		clock_startstop(1);
+		nsleep(300*1000);
+		clock_startstop(0);
 		nsleep(700*1000);
 	}
 }
 
-void send_timecode(int duration)
+void send_timecode()
 {
-	if (duration)
-		printf("Sending MSF timecode for %d seconds\n", duration);
-	else
-		printf("Sending MSF timecode continuously\n");
-
-	if (duration && duration < 60)
-	{
-		fprintf(stderr, "Error! Minimum transmit time of 60s required\n");
-		clock_startstop(0);
-		exit(1);
-	}
-
 	MSF timecode[60];
 
 	// Precision clock:
@@ -296,7 +284,7 @@ void send_timecode(int duration)
 	gettimeofday(&tv, NULL);
 	int tv_start = tv.tv_sec;
 
-	while (!duration || tv.tv_sec < tv_start + duration)
+	while (true)
 	{
 		// Align with system clock:
 		gettimeofday(&tv, NULL);
@@ -353,7 +341,6 @@ void signal_handler(int signo)
 
 int main(int argc, char **argv)
 {
-	int duration = 0;
 
 	if (signal(SIGINT, signal_handler) == SIG_ERR)
 		printf("Error! Unable to catch SIGINT\n");
@@ -366,12 +353,8 @@ int main(int argc, char **argv)
 			case 'v':
 				verbose = 1;
 				break;
-			case 't':
-				duration = atoi(optarg);
-				break;
 			default:
 				fprintf(stderr, "Usage: pimsf [options]\n" \
-					"\t-t <duration> Send timecode for duration seconds\n" \
 					"\t-v Verbose\n"
 				);
 				clock_startstop(0);
@@ -379,7 +362,7 @@ int main(int argc, char **argv)
 		}
 	}
         setup_gpio();
-	send_timecode(duration);
+	send_timecode();
 	clock_startstop(0);
 	return 0;
 }
