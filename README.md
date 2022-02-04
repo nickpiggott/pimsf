@@ -29,15 +29,10 @@ For help enter:
 ```
 $ sudo ./pimsf -h
 Usage: pimsf [options]
-        -s Start 60kHz carrier
-        -e Stop 60kHz carrier
-        -t <duration> Send timecode for duration seconds
         -v Verbose
 ```
 
-The -t switch limits the transmit time to the period specified, in seconds.
-
-With no switches specified the time signal is sent indefinitely.
+The time signal is sent indefinitely.
 
 ### Accuracy
 
