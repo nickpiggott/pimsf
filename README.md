@@ -2,7 +2,7 @@
 
 This is a small program for emulating the MSF Radio Time Signal using a Raspberry Pi. It's forked from marksmanuk/pimsf (which modulates it to a 60kHz carrier).
 
-Written to time synchronise a Wharton digital clock which needs an input pin modulating with MSF signal.
+Written to time synchronise a Wharton digital clock which needs an input pin modulating with MSF signal. The GPIO output (input to the clock) is driven LOW when active.
 
 ## Getting Started
 
