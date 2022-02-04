@@ -333,8 +333,8 @@ void signal_handler(int signo)
 {
 	if (signo == SIGINT)
 	{
-		printf("\nSIGINT received, shutting down carrier\n");
-		clock_startstop(0);
+		printf("\nSIGINT received, shutting down\n");
+		clock_startstop(1);
 		exit(0);
 	}
 }
@@ -357,13 +357,14 @@ int main(int argc, char **argv)
 				fprintf(stderr, "Usage: pimsf [options]\n" \
 					"\t-v Verbose\n"
 				);
-				clock_startstop(0);
+				clock_startstop(1);
 				return 1;
 		}
 	}
         setup_gpio();
+	clock_startstop(1);
 	send_timecode();
-	clock_startstop(0);
+	clock_startstop(1);
 	return 0;
 }
 
