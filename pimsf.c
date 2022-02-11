@@ -282,7 +282,6 @@ void send_timecode()
 	char buffer[36];
 
 	gettimeofday(&tv, NULL);
-	int tv_start = tv.tv_sec;
 
 	while (true)
 	{
