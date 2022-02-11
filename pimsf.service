@@ -1,0 +1,15 @@
+# Example systemd unit file to make sure pimsf only starts after NTP time synch is achieved
+# place this in /etc/systemd/system
+# and enable with
+# sudo systemctl enable pimsf
+
+[Unit]
+Description=MSF Clock Generator
+After=time-sync.target
+Wants=time-sync.target
+
+[Service]
+ExecStart=/usr/sbin/pimsf
+
+[Install]
+WantedBy=multi-user.target
