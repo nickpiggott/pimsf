@@ -43,6 +43,14 @@ The program sends the system date & time from the Raspberry Pi.  I've assumed th
 * Raspberry Pi
 * gcc - to complile the program
 
+### Configure to run as a Service at startup
+
+You can get pimsf to run at start up by adding it as a service
+
+Copy the compiled binary pimsf to /usr/sbin/pimsf
+Copy the service file pimsf.service to /etc/systemd/system/pimsf.service and then enable it with `sudo systemctl enable pimsf`
+
+
 ### Statuslights
 
 There is a folder containing a bash script and a systemd service file. 
