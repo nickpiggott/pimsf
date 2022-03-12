@@ -43,6 +43,17 @@ The program sends the system date & time from the Raspberry Pi.  I've assumed th
 * Raspberry Pi
 * gcc - to complile the program
 
+### Statuslights
+
+There is a folder containing a bash script and a systemd service file. 
+
+The bash script will make GPIO5 (network connection lost) and GPIO6 (time not synched) high in failure conditions, low otherwise.
+You can connect LEDs to these pins (via suitable value resistors) to give you a status output of the PiMSF.
+
+Copy the bash script statuslights to /usr/sbin/statuslights
+Copy the service file statuslights.service to /etc/systemd/system/statuslights.service and then enable it with `sudo systemctl enable statuslights`
+
+
 ## Authors
 
 * **Mark Street** [marksmanuk](https://github.com/marksmanuk)
