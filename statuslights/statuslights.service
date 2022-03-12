@@ -1,0 +1,13 @@
+# Example systemd unit file to start the statuslights for network and time at start up
+# place this in /etc/systemd/system
+# and enable with
+# sudo systemctl enable statuslights
+
+[Unit]
+Description=MSF Clock Generator
+
+[Service]
+ExecStart=/usr/sbin/statuslights
+
+[Install]
+WantedBy=multi-user.target
