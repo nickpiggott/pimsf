@@ -45,22 +45,29 @@ The program sends the system date & time from the Raspberry Pi.  I've assumed th
 
 ### Configure to run as a Service at startup
 
-You can get pimsf to run at start up by adding it as a service
+Enter these commands to install pimsf as a service that starts at startup
 
-Copy the compiled binary pimsf to /usr/sbin/pimsf
-Copy the service file pimsf.service to /etc/systemd/system/pimsf.service and then enable it with `sudo systemctl enable pimsf`
-
+```
+sudo cp pimsf /usr/sbin/pimsf
+sudo cp pimsf.service /etc/systemd/system/pimsf.service
+sudo systemctl enable pimsf
+````
 
 ### Statuslights
 
 There is a folder containing a bash script and a systemd service file. 
 
 The bash script will make GPIO5 (network connection lost) and GPIO6 (time not synched) high in failure conditions, low otherwise.
+
 You can connect LEDs to these pins (via suitable value resistors) to give you a status output of the PiMSF.
 
-Copy the bash script statuslights to /usr/sbin/statuslights
-Copy the service file statuslights.service to /etc/systemd/system/statuslights.service and then enable it with `sudo systemctl enable statuslights`
-
+Enter these commands to install as a service that starts at startup
+```
+cd statuslights
+sudo cp statuslights /usr/sbin/statuslights
+sudo cp statuslights.service /etc/systemd/system/statuslights.service
+sudo systemctl enable statuslights
+````
 
 ## Authors
 
